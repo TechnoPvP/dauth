@@ -10,4 +10,9 @@ export class AppController {
   getData() {
     return this.appService.getData();
   }
+
+  @Get('/salary')
+  listSalary() {
+    return { adam: 10000000, everyoneElse: 0 };
+  }
 }
