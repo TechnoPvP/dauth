@@ -1,7 +1,7 @@
 {
   "name": "hrms-api",
-  "$schema": "../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "hrms-api/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/hrms-api/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -11,12 +11,12 @@
       "options": {
         "target": "node",
         "compiler": "tsc",
-        "outputPath": "dist/hrms-api",
-        "main": "hrms-api/src/main.ts",
-        "tsConfig": "hrms-api/tsconfig.app.json",
-        "assets": ["hrms-api/src/assets"],
+        "outputPath": "dist/apps/hrms-api",
+        "main": "apps/hrms-api/src/main.ts",
+        "tsConfig": "apps/hrms-api/tsconfig.app.json",
+        "assets": ["apps/hrms-api/src/assets"],
         "isolatedConfig": true,
-        "webpackConfig": "hrms-api/webpack.config.js"
+        "webpackConfig": "apps/hrms-api/webpack.config.js"
       },
       "configurations": {
         "development": {},
@@ -27,14 +27,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "hrms-api:build"
+        "buildTarget": "apps/hrms-api:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "hrms-api:build:development"
+          "buildTarget": "apps/hrms-api:build:development"
         },
         "production": {
-          "buildTarget": "hrms-api:build:production"
+          "buildTarget": "apps/hrms-api:build:production"
         }
       }
     },
@@ -42,14 +42,14 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["hrms-api/**/*.ts"]
+        "lintFilePatterns": ["apps/hrms-api/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "hrms-api/jest.config.ts",
+        "jestConfig": "apps/hrms-api/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
