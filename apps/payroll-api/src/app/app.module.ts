@@ -10,9 +10,15 @@ import { DatabaseModule } from '@dauth/database-service';
 import { AuthModule } from '../modules/auth/auth.module';
 import { UsersModule } from '../modules/users/users.module';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, UsersModule],
+  imports: [
+    DatabaseModule,
+    AuthModule,
+    UsersModule,
+    PassportModule.register({ session: true, defaultStrategy: 'local' }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,

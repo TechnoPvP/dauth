@@ -25,7 +25,13 @@ export class UsersService {
   }
 
   async retrieve(id: number) {
-    const users = await this.prisma.user.findUnique({ where: { id } });
+    const users = await this.prisma.user.findUniqueOrThrow({ where: { id } });
+
+    return users;
+  }
+
+  async retrieveByEmail(email: string) {
+    const users = await this.prisma.user.findFirstOrThrow({ where: { email } });
 
     return users;
   }
