@@ -5,6 +5,7 @@ import session, { MemoryStore } from 'express-session';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
 import passport from 'passport';
+import morgan from 'morgan';
 
 const expressSession = session({
   secret: '12398damdm12adwmdaw129',
@@ -22,6 +23,20 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = 5010;
 
+  app.enableCors({
+    credentials: true,
+    allowedHeaders:
+      'Origin, X-Requested-With, Content, Accept, Process-Data, Authorization',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    origin: (
+      requestOrigin: string,
+      callback: (err: Error | null, origin?: any) => void
+    ) => {
+      return callback(null, requestOrigin);
+    },
+  });
+
+  app.use(morgan('dev'))
   app.use(expressSession);
   app.use(passport.session());
   app.use(passport.initialize());
