@@ -11,16 +11,62 @@ datasource db {
 }
 
 model User {
-  id         Int    @id @default(autoincrement())
-  first_name String
-  last_name  String
-  email      String
-  password   String
+  id             Int            @id @default(autoincrement())
+  first_name     String
+  last_name      String
+  email          String
+  avatar         String?
+  password       String?
+  auth_provider  AuthProvider
+  github_auth    GithubAuth?
+  google_auth    GoogleAuth?
+  microsoft_auth MicrosoftAuth?
+}
+
+model GithubAuth {
+  id          Int      @id @default(autoincrement())
+  githubId    Int      @unique
+  username    String
+  api_url     String
+  html_url    String
+  bio         String?
+  access_code String
+  user        User     @relation(fields: [user_id], references: [id])
+  user_id     Int      @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model GoogleAuth {
+  id          Int      @id @default(autoincrement())
+  username    String
+  access_code String
+  user        User     @relation(fields: [user_id], references: [id])
+  user_id     Int      @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model MicrosoftAuth {
+  id          Int      @id @default(autoincrement())
+  username    String
+  access_code String
+  user        User     @relation(fields: [user_id], references: [id])
+  user_id     Int      @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+enum AuthProvider {
+  GITHUB
+  GOOGLE
+  LOCAL
+  MICROSOFT
 }
 
 model Session {
   id        String   @id
   sid       String   @unique
   data      String
-  expiresAt   DateTime
+  expiresAt DateTime
 }

@@ -21,7 +21,7 @@ const expressSession = session({
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = 5010;
+  const port = process.env.PORT || 5050;
 
   app.enableCors({
     credentials: true,

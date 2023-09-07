@@ -3,7 +3,7 @@ import { Strategy, StrategyOption, StrategyOptions } from 'passport-github2';
 import { VerifyFunctionWithRequest } from 'passport-local';
 
 export class GithubStrategy extends PassportStrategy(Strategy) {
-  constructor(params) {
+  constructor(params: any) {
     super({
       clientID: process.env['GITHUB_CLIENT_ID'],
       clientSecret: process.env['GITHUB_CLIENT_SECRET'],
@@ -14,14 +14,13 @@ export class GithubStrategy extends PassportStrategy(Strategy) {
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile,
+    profile: any,
     done: (err: string, profile: any) => void
   ): Promise<any> {
-
-    console.log(accessToken, refreshToken);
     // Here you can handle the user profile received from GitHub and decide how you want to process
     // You can save the user to the database, or find the user in the database and return the user
     // For demonstration purposes, we'll just return the profile
+    console.log({ accessToken, refreshToken, profile });
     return done('Some error happened', profile);
   }
 }

@@ -37,13 +37,15 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const hashedPassword = await hash(updateUserDto.password, 10);
+    const hashedPassword = updateUserDto.password
+      ? await hash(updateUserDto.password, 10)
+      : undefined;
 
     const users = await this.prisma.user.update({
       where: { id },
       data: {
         ...updateUserDto,
-        password: updateUserDto.password ? hashedPassword : undefined,
+        password: hashedPassword,
       },
     });
 

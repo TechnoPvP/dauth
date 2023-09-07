@@ -1,6 +1,7 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import './styles.css';
+import RootLayout from '../libs/layout/RootLayout';
 
 function CustomApp({ Component, pageProps }: AppProps) {
   return (
@@ -8,9 +9,10 @@ function CustomApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>Welcome to auth-web!</title>
       </Head>
-      <main className="app">
+
+      <RootLayout>
         <Component {...pageProps} />
-      </main>
+      </RootLayout>
     </>
   );
 }
