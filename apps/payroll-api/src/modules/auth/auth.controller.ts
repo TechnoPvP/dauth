@@ -3,7 +3,9 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Request,
+  Response,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -12,10 +14,20 @@ import { AuthService } from './auth.service';
 import { GithubCallbackDto } from './dto/github-callback.dto';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import {
+  Response as ExpressResponse,
+  Request as ExpressRequest,
+} from 'express';
+import { GithubAuthGuard } from './guards/github-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly github: GithubApi) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly github: GithubApi
+  ) {}
+
+  private readonly DEFAULT_REDIRECT_URL = 'https://localhost:4200';
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -23,15 +35,32 @@ export class AuthController {
     return req.user;
   }
 
-  @UseGuards(AuthGuard('github'))
+  @UseGuards(GithubAuthGuard)
   @Get('login/github')
-  async loginGithub(@Request() req: any) {
+  async loginGithub(@Request() req: ExpressRequest) {
+    req.session.redirectUrl = 'https://payroll.airhublabs.dev';
+    req.session.user['redirectUrl'] = 'Some redirect';
+    // req.session.save((err) => err && console.error(err));
+
+    console.log({
+      passportLogin: req.session?.passport?.redirectUrl,
+      passportUser: req.session?.user?.redirectUrl,
+    });
+    console.log('Hit login');
+
     return req.user;
   }
 
-  @Post('github/callback')
-  async githubCallback(@Body() githubCallbackDto: GithubCallbackDto) {
-    return this.authService.githubCallback(githubCallbackDto)
+  @UseGuards(GithubAuthGuard)
+  @Get('github/callback')
+  async githubCallback(
+    @Request() req: ExpressRequest,
+    @Response() res: ExpressResponse,
+    @Query() githubCallbackDto: any
+  ) {
+    const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
+
+    return res.redirect(redirectUrl);
   }
 
   @UseGuards(AuthenticatedGuard)

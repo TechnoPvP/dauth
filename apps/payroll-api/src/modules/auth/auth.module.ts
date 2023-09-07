@@ -10,6 +10,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 @Module({
   imports: [UsersModule, GithubApiModule],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, SessionSerializer, GithubStrategy],
+  providers: [AuthService, LocalStrategy, GithubStrategy, SessionSerializer],
+  exports: [AuthService],
 })
 export class AuthModule {}

@@ -5,7 +5,10 @@ import { LoginDto } from './dto/auth.dto';
 import { GithubCallbackDto } from './dto/github-callback.dto';
 import { GithubApi } from '../../common/auth/github/github.api';
 import { PrismaService } from '@dauth/database-service';
-import { AuthProvider } from '@prisma/client';
+import { AuthProvider, Prisma } from '@prisma/client';
+import { BaseAuthEntity } from './entities/auth.entity';
+import { GithubStrategy } from './strategies/github.strategy';
+import { GithubProfileEntity } from '../../common/auth/github/github-profile.entity';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +40,9 @@ export class AuthService {
     return null;
   }
 
-  async githubCallback(githubCallbackDto: GithubCallbackDto) {
+  async githubCallback(
+    githubCallbackDto: GithubCallbackDto
+  ): Promise<BaseAuthEntity<any>> {
     const octokit = await this.github.getAuthenticatedOctoKit({
       authorizationCode: githubCallbackDto.code,
     });
@@ -74,6 +79,51 @@ export class AuthService {
       include: { user: true },
     });
 
-    return user;
+    return { data: user, type: AuthProvider.GITHUB, redirect_uri: '' };
+  }
+
+  async githubCallbackV2(params: {
+    profile: GithubProfileEntity;
+    accessToken: string;
+  }): Promise<BaseAuthEntity<any>> {
+    const profile = params.profile;
+
+    const [firstName, lastName] =
+      profile.displayName?.split(' ') || 'Unknown Unknown';
+
+    const GITHUB_USER_DATA: Omit<
+      Prisma.GithubAuthCreateInput & Prisma.GithubAuthUpdateInput,
+      'user'
+    > = {
+      access_code: params.accessToken,
+      api_url: profile._json.url,
+      bio: profile._json.bio,
+      username: profile.username,
+      html_url: profile.profileUrl,
+      githubId: +profile.id,
+    };
+
+    const user = await this.prisma.githubAuth.upsert({
+      where: { githubId: +profile.id },
+      update: {
+        ...GITHUB_USER_DATA,
+      },
+      create: {
+        ...GITHUB_USER_DATA,
+        user: {
+          create: {
+            email: `${profile.username}@github.com`,
+            // email: profile?.email || `${profile.login}@unknown.com`,
+            // avatar: profile.avatar_url,
+            first_name: firstName,
+            last_name: lastName,
+            auth_provider: AuthProvider.GITHUB,
+          },
+        },
+      },
+      include: { user: true },
+    });
+
+    return { data: user, type: AuthProvider.GITHUB, redirect_uri: '' };
   }
 }

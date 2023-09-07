@@ -11,7 +11,7 @@ const expressSession = session({
   secret: '12398damdm12adwmdaw129',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false },
+  cookie: { secure: false, httpOnly: true, sameSite: 'lax' },
   store: new PrismaSessionStore(new PrismaClient(), {
     checkPeriod: 2 * 60 * 1000,
     dbRecordIdIsSessionId: true,
@@ -36,13 +36,21 @@ async function bootstrap() {
     },
   });
 
-  app.use(morgan('dev'))
+  app.use(morgan('dev'));
   app.use(expressSession);
   app.use(passport.session());
   app.use(passport.initialize());
 
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);
+}
+
+declare module 'express-session' {
+  interface SessionData {
+    user?: any;
+    passport?: any;
+    redirectUrl?: string;
+  }
 }
 
 bootstrap();

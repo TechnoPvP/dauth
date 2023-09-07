@@ -6,15 +6,21 @@ import { VStack } from '@chakra-ui/layout';
 import { EmailIcon, LockIcon } from '@chakra-ui/icons';
 import { Divider } from '@chakra-ui/react';
 import { Text } from '@chakra-ui/react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Link from 'next/link';
 
 export function Index() {
-  const handleGithubLogin = async () => {
-    const HOST = 'http://localhost:5050';
-    const response = await axios.post(`${HOST}/auth/login/github`);
-
-    console.log(response);
+  const handleMe = async () => {
+    try {
+      const response = await axios.get('http://localhost:5050/auth/me', {
+        withCredentials: true,
+      });
+      console.log(response.data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(error.response?.data);
+      }
+    }
   };
 
   return (
@@ -52,6 +58,8 @@ export function Index() {
               Login
             </Button>
 
+            <Button onClick={handleMe}>Me</Button>
+
             <Divider />
 
             <Button
@@ -72,7 +80,9 @@ export function Index() {
               Continue with Twitter
             </Button>
 
-    <a href="http://localhost:5050/auth/login/github">Continue With Github </a>
+            <a href="http://localhost:5050/auth/login/github">
+              Continue With Github{' '}
+            </a>
 
             {/* <Link href="http://localhost:5050/auth/login/github" style={{width: '100%'}}>
               <Button
