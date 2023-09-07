@@ -9,6 +9,7 @@ import { AuthProvider, Prisma } from '@prisma/client';
 import { BaseAuthEntity } from './entities/auth.entity';
 import { GithubStrategy } from './strategies/github.strategy';
 import { GithubProfileEntity } from '../../common/auth/github/github-profile.entity';
+import { GoogleProfileEntity } from './entities/google-profile.entity';
 
 @Injectable()
 export class AuthService {
@@ -40,49 +41,7 @@ export class AuthService {
     return null;
   }
 
-  async githubCallback(
-    githubCallbackDto: GithubCallbackDto
-  ): Promise<BaseAuthEntity<any>> {
-    const octokit = await this.github.getAuthenticatedOctoKit({
-      authorizationCode: githubCallbackDto.code,
-    });
-
-    const { data } = await octokit.rest.users.getAuthenticated();
-    const [firstName, lastName] = data.name?.split(' ') || 'Unknown Unknown';
-
-    const user = await this.prisma.githubAuth.upsert({
-      where: { githubId: data.id },
-      update: {
-        access_code: githubCallbackDto.code,
-        api_url: data.url,
-        bio: data.bio,
-        username: data.login,
-        html_url: data.html_url,
-      },
-      create: {
-        access_code: githubCallbackDto.code,
-        api_url: data.url,
-        bio: data.bio,
-        username: data.login,
-        html_url: data.html_url,
-        githubId: data.id,
-        user: {
-          create: {
-            email: data?.email || `${data.login}@unknown.com`,
-            first_name: firstName,
-            last_name: lastName,
-            avatar: data.avatar_url,
-            auth_provider: AuthProvider.GITHUB,
-          },
-        },
-      },
-      include: { user: true },
-    });
-
-    return { data: user, type: AuthProvider.GITHUB, redirect_uri: '' };
-  }
-
-  async githubCallbackV2(params: {
+  async githubCallback(params: {
     profile: GithubProfileEntity;
     accessToken: string;
   }): Promise<BaseAuthEntity<any>> {
@@ -125,5 +84,47 @@ export class AuthService {
     });
 
     return { data: user, type: AuthProvider.GITHUB, redirect_uri: '' };
+  }
+
+  async googleCallback(params: {
+    profile: GoogleProfileEntity;
+    accessToken: string;
+    refreshToken?: string;
+  }) {
+    const { profile } = params;
+
+    const user = await this.prisma.googleAuth.upsert({
+      where: { googleId: profile.id },
+      create: {
+        googleId: profile.id,
+        access_code: params.accessToken,
+        refresh_token: params.refreshToken,
+        user: {
+          create: {
+            auth_provider: AuthProvider.GOOGLE,
+            email: profile._json.email,
+            first_name: profile._json.given_name,
+            last_name: profile._json.family_name,
+            avatar: profile._json.picture,
+          },
+        },
+      },
+      update: {
+        googleId: profile.id,
+        access_code: params.accessToken,
+        refresh_token: params.refreshToken,
+        user: {
+          update: {
+            auth_provider: AuthProvider.GOOGLE,
+            email: profile._json.email,
+            first_name: profile._json.given_name,
+            last_name: profile._json.family_name,
+            avatar: profile._json.picture,
+          },
+        },
+      },
+    });
+
+    return user;
   }
 }

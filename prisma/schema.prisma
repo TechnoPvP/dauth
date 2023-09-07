@@ -31,27 +31,30 @@ model GithubAuth {
   html_url    String
   bio         String?
   access_code String
-  user        User     @relation(fields: [user_id], references: [id])
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id     Int      @unique
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 }
 
 model GoogleAuth {
-  id          Int      @id @default(autoincrement())
-  username    String
-  access_code String
-  user        User     @relation(fields: [user_id], references: [id])
-  user_id     Int      @unique
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  googleId       String   @unique
+  access_code    String
+  refresh_token  String?
+  email_verified Boolean?
+  locale         String?
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id        Int      @unique
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 }
 
 model MicrosoftAuth {
   id          Int      @id @default(autoincrement())
   username    String
   access_code String
-  user        User     @relation(fields: [user_id], references: [id])
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id     Int      @unique
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt

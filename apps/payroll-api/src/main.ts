@@ -38,8 +38,8 @@ async function bootstrap() {
 
   app.use(morgan('dev'));
   app.use(expressSession);
-  app.use(passport.session());
   app.use(passport.initialize());
+  app.use(passport.session());
 
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);

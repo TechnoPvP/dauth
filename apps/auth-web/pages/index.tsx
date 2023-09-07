@@ -13,7 +13,7 @@ export function Index() {
   const handleMe = async () => {
     try {
       const response = await axios.get('http://localhost:5050/auth/me', {
-        withCredentials: true,
+        withCredentials: true
       });
       console.log(response.data);
     } catch (error) {
@@ -68,23 +68,30 @@ export function Index() {
               borderColor="gray.200"
               color="gray.600"
             >
-              Continue with Google
+               Continue with Twitter
             </Button>
 
-            <Button
-              variant="outline"
-              w="full"
-              borderColor="gray.200"
-              color="gray.600"
+            {/* <Link
+              href="http://localhost:5050/auth/login/google"
+              style={{ width: '100%' }}
             >
-              Continue with Twitter
-            </Button>
+              <Button
+                variant="outline"
+                w="full"
+                borderColor="gray.200"
+                color="gray.600"
+              >
+                Continue with Google
+              </Button>
+            </Link> */}
 
-            <a href="http://localhost:5050/auth/login/github">
-              Continue With Github{' '}
-            </a>
+            <a href="http://localhost:5050/auth/login/google?redirectUrl=https://webrevived.com">Continue with Google</a>
+            <a href="http://localhost:5050/auth/login/github?redirectUrl=https://webrevived.com">Continue with Github</a>
 
-            {/* <Link href="http://localhost:5050/auth/login/github" style={{width: '100%'}}>
+            {/* <Link
+              href="http://localhost:5050/auth/login/github"
+              style={{ width: '100%' }}
+            >
               <Button
                 variant="outline"
                 w="full"

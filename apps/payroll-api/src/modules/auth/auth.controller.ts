@@ -19,6 +19,8 @@ import {
   Request as ExpressRequest,
 } from 'express';
 import { GithubAuthGuard } from './guards/github-auth.guard';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -39,14 +41,6 @@ export class AuthController {
   @Get('login/github')
   async loginGithub(@Request() req: ExpressRequest) {
     req.session.redirectUrl = 'https://payroll.airhublabs.dev';
-    req.session.user['redirectUrl'] = 'Some redirect';
-    // req.session.save((err) => err && console.error(err));
-
-    console.log({
-      passportLogin: req.session?.passport?.redirectUrl,
-      passportUser: req.session?.user?.redirectUrl,
-    });
-    console.log('Hit login');
 
     return req.user;
   }
@@ -61,6 +55,23 @@ export class AuthController {
     const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
 
     return res.redirect(redirectUrl);
+  }
+
+  @UseGuards(GoogleAuthGuard)
+  @Get('login/google')
+  async loginGoogle(@Request() req: ExpressRequest) {
+    return req?.user;
+  }
+
+  @UseGuards(GoogleAuthGuard)
+  @Get('google/callback')
+  async googleCallback(
+    @Request() req: ExpressRequest,
+    @Response() res: ExpressResponse
+  ) {
+    // const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
+
+    return res.redirect("http://localhost:4200");
   }
 
   @UseGuards(AuthenticatedGuard)

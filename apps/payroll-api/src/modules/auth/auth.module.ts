@@ -6,11 +6,12 @@ import { AuthService } from './auth.service';
 import { SessionSerializer } from './session/session.serializer';
 import { GithubStrategy } from './strategies/github.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [UsersModule, GithubApiModule],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, GithubStrategy, SessionSerializer],
+  providers: [AuthService, LocalStrategy, GithubStrategy, GoogleStrategy, SessionSerializer],
   exports: [AuthService],
 })
 export class AuthModule {}
