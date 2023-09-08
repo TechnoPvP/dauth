@@ -62,14 +62,16 @@ export function Index() {
 
             <Divider />
 
-            <Button
+            {/* <Button
               variant="outline"
               w="full"
               borderColor="gray.200"
               color="gray.600"
             >
-               Continue with Twitter
-            </Button>
+               Continue with Microsoft
+            </Button> */}
+
+
 
             {/* <Link
               href="http://localhost:5050/auth/login/google"
@@ -85,6 +87,7 @@ export function Index() {
               </Button>
             </Link> */}
 
+            <a href="http://localhost:5050/auth/login/azure">Continue with Microsoft</a>
             <a href="http://localhost:5050/auth/login/google?redirectUrl=https://webrevived.com">Continue with Google</a>
             <a href="http://localhost:5050/auth/login/github?redirectUrl=https://webrevived.com">Continue with Github</a>
 

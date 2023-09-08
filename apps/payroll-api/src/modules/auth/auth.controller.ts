@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Post,
   Query,
   Request,
@@ -21,15 +22,17 @@ import {
 import { GithubAuthGuard } from './guards/github-auth.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { AzureAdAuthGuard } from './guards/azure-ad-auth.guard';
 
 @Controller('auth')
 export class AuthController {
+  private readonly DEFAULT_REDIRECT_URL = 'https://localhost:4200';
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private readonly authService: AuthService,
     private readonly github: GithubApi
   ) {}
-
-  private readonly DEFAULT_REDIRECT_URL = 'https://localhost:4200';
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -54,6 +57,7 @@ export class AuthController {
   ) {
     const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
 
+    // return req.user
     return res.redirect(redirectUrl);
   }
 
@@ -69,9 +73,27 @@ export class AuthController {
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse
   ) {
+    const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
+
+    return res.redirect(redirectUrl);
+  }
+
+  @UseGuards(AzureAdAuthGuard)
+  @Get('login/azure')
+  async loginAzure(@Request() req: ExpressRequest) {
+    return req?.user || { message: 'ok' };
+  }
+
+  @UseGuards(AzureAdAuthGuard)
+  @Post('azure/callback')
+  async azureCallback(
+    @Request() req: ExpressRequest,
+    @Response() res: ExpressResponse
+  ) {
+    this.logger.debug('HIT AZURE CALLBACK FUNCTION');
     // const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
 
-    return res.redirect("http://localhost:4200");
+    return res.redirect('http://localhost:4200');
   }
 
   @UseGuards(AuthenticatedGuard)

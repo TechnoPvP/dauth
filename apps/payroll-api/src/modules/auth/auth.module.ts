@@ -7,11 +7,19 @@ import { SessionSerializer } from './session/session.serializer';
 import { GithubStrategy } from './strategies/github.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { AzureAdAuthStrategy } from './strategies/azure-ad.strategy';
 
 @Module({
   imports: [UsersModule, GithubApiModule],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, GithubStrategy, GoogleStrategy, SessionSerializer],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    GithubStrategy,
+    GoogleStrategy,
+    AzureAdAuthStrategy,
+    SessionSerializer,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

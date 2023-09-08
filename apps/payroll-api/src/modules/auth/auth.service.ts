@@ -10,6 +10,7 @@ import { BaseAuthEntity } from './entities/auth.entity';
 import { GithubStrategy } from './strategies/github.strategy';
 import { GithubProfileEntity } from '../../common/auth/github/github-profile.entity';
 import { GoogleProfileEntity } from './entities/google-profile.entity';
+import { MicrosoftProfileEntity } from './entities/microsoft-profile.entity';
 
 @Injectable()
 export class AuthService {
@@ -126,5 +127,65 @@ export class AuthService {
     });
 
     return user;
+  }
+
+  async microsoftCallback(params: { profile: MicrosoftProfileEntity }) {
+    const { profile } = params;
+
+    const name = this.getFormattedMicrosoftDisplayName(profile.displayName);
+
+    const user = await this.prisma.microsoftAuth.upsert({
+      where: { oid: profile.oid },
+      create: {
+        oid: profile.oid,
+        email: profile._json.email,
+        display_name: profile.displayName,
+        user: {
+          create: {
+            auth_provider: AuthProvider.MICROSOFT,
+            email: profile._json.email,
+            first_name: name.firstName,
+            last_name: name.lastName,
+          },
+        },
+      },
+      update: {
+        oid: profile.oid,
+        user: {
+          update: {
+            auth_provider: AuthProvider.GOOGLE,
+            email: profile._json.email,
+            first_name: name.firstName,
+            last_name: name.lastName,
+          },
+        },
+      },
+    });
+
+    return user;
+  }
+
+  getFormattedMicrosoftDisplayName(displayName: string) {
+    const [name, companyName] = displayName
+      .split('|')
+      .map((part) => part.trim());
+
+    let firstName: string | undefined = undefined;
+    let middleName: string | undefined = undefined;
+    let lastName: string | undefined = undefined;
+
+    const nameParts = name.trim().split(' ');
+
+    firstName = nameParts[0];
+
+    //   Contains middle name
+    if (nameParts.length >= 3) {
+      middleName = nameParts[1];
+      lastName = nameParts[2];
+    } else {
+      lastName = nameParts[1];
+    }
+
+    return { firstName, middleName, lastName, companyName };
   }
 }

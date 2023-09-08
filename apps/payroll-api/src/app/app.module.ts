@@ -4,20 +4,20 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { DatabaseModule } from '@dauth/database-service';
-import { AuthModule } from '../modules/auth/auth.module';
-import { UsersModule } from '../modules/users/users.module';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
+import { AuthModule } from '../modules/auth/auth.module';
+import { UsersModule } from '../modules/users/users.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'local', session: true }),
     DatabaseModule,
     AuthModule,
     UsersModule,
-    PassportModule.register({ session: true, defaultStrategy: 'local' }),
   ],
   controllers: [AppController],
   providers: [
@@ -33,6 +33,10 @@ import { PassportModule } from '@nestjs/passport';
         whitelist: true,
       }),
     },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: UnauthorizedExceptionFilter,
+    // },
   ],
 })
 export class AppModule {}

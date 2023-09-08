@@ -11,7 +11,7 @@ const expressSession = session({
   secret: '12398damdm12adwmdaw129',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, httpOnly: true, sameSite: 'lax' },
+  cookie: { secure: false, httpOnly: true, sameSite: 'none' },
   store: new PrismaSessionStore(new PrismaClient(), {
     checkPeriod: 2 * 60 * 1000,
     dbRecordIdIsSessionId: true,
@@ -37,7 +37,19 @@ async function bootstrap() {
   });
 
   app.use(morgan('dev'));
-  app.use(expressSession);
+  app.use(
+    session({
+      secret: '12398damdm12adwmdaw129',
+      resave: false,
+      saveUninitialized: false,
+      cookie: { secure: false, httpOnly: true },
+      store: new PrismaSessionStore(new PrismaClient(), {
+        checkPeriod: 2 * 60 * 1000,
+        dbRecordIdIsSessionId: true,
+        dbRecordIdFunction: undefined,
+      }),
+    })
+  );
   app.use(passport.initialize());
   app.use(passport.session());
 

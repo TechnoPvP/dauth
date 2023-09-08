@@ -51,13 +51,14 @@ model GoogleAuth {
 }
 
 model MicrosoftAuth {
-  id          Int      @id @default(autoincrement())
-  username    String
-  access_code String
-  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id     Int      @unique
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  oid          String   @unique
+  email        String
+  display_name String
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id      Int      @unique
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }
 
 enum AuthProvider {
