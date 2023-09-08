@@ -1,19 +1,38 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { Request, Response } from 'express';
+import passport from 'passport';
 
 @Injectable()
-export class GithubAuthGuard extends AuthGuard('github') {
+export class GithubAuthGuard {
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const result = (await super.canActivate(context)) as boolean;
+    const ctx = context.switchToHttp();
+    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<Response>();
+    // const result = (await super.canActivate(context)) as boolean;
 
-    if (result && !request?.session?.passport) {
-      request.session.redirectUrl =
-        (request.query.redirectUrl as string) || 'http//localhost:4200';
-      await super.logIn(request);
-    }
+    return new Promise((resolve, reject) => {
+      passport.authenticate(
+        'github',
+        { session: true,  },
+        (err: any, user: any, info: any) => {
 
-    return result;
+          console.log({user, err, info});
+
+          if (err || !user) {
+            reject(new UnauthorizedException());
+            return;
+          }
+          request.user = user;
+          resolve(true);
+        }
+      )(request, response);
+    });
+
+    // return result;
   }
 }

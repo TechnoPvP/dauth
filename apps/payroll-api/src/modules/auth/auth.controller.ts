@@ -23,6 +23,7 @@ import { GithubAuthGuard } from './guards/github-auth.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { AzureAdAuthGuard } from './guards/azure-ad-auth.guard';
+import { redisClient } from '../../main';
 
 @Controller('auth')
 export class AuthController {
@@ -97,6 +98,7 @@ export class AuthController {
   @Get('me')
   async me(@Request() req: ExpressRequest) {
     console.log(req.session, req.user);
+    redisClient.set("another", 10)
     return req.user;
   }
 }

@@ -2,17 +2,22 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 
+// @Injectable()
+// export class GoogleAuthGuard extends AuthGuard('google') {}
+
 @Injectable()
 export class GoogleAuthGuard extends AuthGuard('google') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     const result = (await super.canActivate(context)) as boolean;
 
-    if (result && !request?.session?.passport) {
-      request.session.redirectUrl =
-        (request.query.redirectUrl as string) || 'http//localhost:4200';
-      await super.logIn(request);
-    }
+    // if (result && !request?.session?.passport) {
+    //   request.session.redirectUrl =
+    //     (request.query.redirectUrl as string) || 'http//localhost:4200';
+    //   await super.logIn(request);
+    // }
+
+    // await super.logIn(request)
 
     return result;
   }

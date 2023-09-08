@@ -5,15 +5,15 @@ import { User } from '@prisma/client';
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
   serializeUser(user: User, done: (err: Error | null, user: User) => void) {
-    console.log({ user });
+    console.log("Serialize user", user)
     done(null, user);
   }
 
   deserializeUser(
     payload: User,
     done: (err: Error | null, user: User) => void
-  ) {
-    console.log({ payload });
+    ) {
+    console.log("Deserialize user", payload)
     done(null, payload);
   }
 }

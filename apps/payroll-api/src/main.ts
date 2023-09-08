@@ -6,8 +6,29 @@ import session from 'express-session';
 import morgan from 'morgan';
 import passport from 'passport';
 import { AppModule } from './app/app.module';
+import { createClient } from 'redis';
+import RedisStoreCLient from 'connect-redis';
 
-const client = new PrismaClient();
+// const client = new PrismaClient();
+
+export const redisClient = createClient({
+  url: 'redis://localhost:6379',
+});
+
+const store = new RedisStoreCLient({
+  client: redisClient,
+});
+
+const bootstrapRedis = async () => {
+  try {
+    await redisClient.connect();
+    console.log('Connected to redis');
+  } catch (error) {
+    console.log("Error connection", error);
+  }
+};
+
+bootstrapRedis()
 
 const expressSession = session({
   secret: 'daw31231231231dd',
@@ -15,15 +36,15 @@ const expressSession = session({
   saveUninitialized: false,
   cookie: {
     secure: false,
-
     maxAge: 24 * 60 * 60 * 1000,
   },
-  store: new PrismaSessionStore(client, {
-    checkPeriod: 2 * 60 * 1000,
-    dbRecordIdIsSessionId: true,
-    dbRecordIdFunction: undefined,
-    logger: console,
-  }),
+  store: store,
+  // store: new PrismaSessionStore(client, {
+  //   checkPeriod: 2 * 60 * 1000,
+  //   dbRecordIdIsSessionId: true,
+  //   dbRecordIdFunction: undefined,
+  //   logger: console,
+  // }),
 });
 
 async function bootstrap() {
@@ -40,7 +61,6 @@ async function bootstrap() {
     },
   });
 
-  app.use(morgan('dev'));
   app.use(expressSession);
   app.use(passport.initialize());
   app.use(passport.session());

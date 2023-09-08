@@ -20,7 +20,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     LocalStrategy,
     GithubStrategy,
     GoogleStrategy,
-    AzureAdAuthStrategy,
+    // AzureAdAuthStrategy,
     SessionSerializer,
   ],
   exports: [AuthService],

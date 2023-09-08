@@ -45,7 +45,7 @@ export class AuthService {
   async githubCallback(params: {
     profile: GithubProfileEntity;
     accessToken: string;
-  }): Promise<BaseAuthEntity<any>> {
+  }) {
     const profile = params.profile;
 
     const [firstName, lastName] =
@@ -84,7 +84,7 @@ export class AuthService {
       include: { user: true },
     });
 
-    return { data: user, type: AuthProvider.GITHUB, redirect_uri: '' };
+    return user;
   }
 
   async googleCallback(params: {
