@@ -8,9 +8,13 @@ import { GithubStrategy } from './strategies/github.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { AzureAdAuthStrategy } from './strategies/azure-ad.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [UsersModule, GithubApiModule],
+  imports: [
+    UsersModule,
+    GithubApiModule,
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,

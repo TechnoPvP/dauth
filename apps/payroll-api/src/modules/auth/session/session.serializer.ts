@@ -3,6 +3,7 @@ import { User } from '@prisma/client';
 
 export class SessionSerializer extends PassportSerializer {
   serializeUser(user: User, done: (err: Error | null, user: User) => void) {
+    console.log({ user });
     done(null, user);
   }
 
@@ -10,6 +11,7 @@ export class SessionSerializer extends PassportSerializer {
     payload: User,
     done: (err: Error | null, user: User) => void
   ) {
+    console.log({ payload });
     done(null, payload);
   }
 }

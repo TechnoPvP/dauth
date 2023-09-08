@@ -13,7 +13,7 @@ export function Index() {
   const handleMe = async () => {
     try {
       const response = await axios.get('http://localhost:5050/auth/me', {
-        withCredentials: true
+        withCredentials: true,
       });
       console.log(response.data);
     } catch (error) {
@@ -71,8 +71,6 @@ export function Index() {
                Continue with Microsoft
             </Button> */}
 
-
-
             {/* <Link
               href="http://localhost:5050/auth/login/google"
               style={{ width: '100%' }}
@@ -87,9 +85,15 @@ export function Index() {
               </Button>
             </Link> */}
 
-            <a href="http://localhost:5050/auth/login/azure">Continue with Microsoft</a>
-            <a href="http://localhost:5050/auth/login/google?redirectUrl=https://webrevived.com">Continue with Google</a>
-            <a href="http://localhost:5050/auth/login/github?redirectUrl=https://webrevived.com">Continue with Github</a>
+            <a href="http://localhost:5050/auth/login/azure">
+              Continue with Microsoft
+            </a>
+            <a href="http://localhost:5050/auth/login/google">
+              Continue with Google
+            </a>
+            <a href="http://localhost:5050/auth/login/github">
+              Continue with Github
+            </a>
 
             {/* <Link
               href="http://localhost:5050/auth/login/github"

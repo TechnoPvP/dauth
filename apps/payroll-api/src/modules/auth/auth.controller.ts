@@ -43,8 +43,6 @@ export class AuthController {
   @UseGuards(GithubAuthGuard)
   @Get('login/github')
   async loginGithub(@Request() req: ExpressRequest) {
-    req.session.redirectUrl = 'https://payroll.airhublabs.dev';
-
     return req.user;
   }
 
@@ -96,9 +94,9 @@ export class AuthController {
     return res.redirect('http://localhost:4200');
   }
 
-  @UseGuards(AuthenticatedGuard)
   @Get('me')
-  async me(@Request() req: any) {
+  async me(@Request() req: ExpressRequest) {
+    console.log(req.session, req.user);
     return req.user;
   }
 }

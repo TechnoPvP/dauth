@@ -1,21 +1,25 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
-import session, { MemoryStore } from 'express-session';
-import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
-import passport from 'passport';
+import { PrismaSessionStore } from '@quixo3/prisma-session-store';
+import session from 'express-session';
 import morgan from 'morgan';
+import passport from 'passport';
+import { AppModule } from './app/app.module';
 
 const expressSession = session({
-  secret: '12398damdm12adwmdaw129',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false, httpOnly: true, sameSite: 'none' },
+  secret: 'daw31231231231dd',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+    secure: false,
+    domain: 'localhost',
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60,
+  },
   store: new PrismaSessionStore(new PrismaClient(), {
     checkPeriod: 2 * 60 * 1000,
     dbRecordIdIsSessionId: true,
-    dbRecordIdFunction: undefined,
   }),
 });
 
@@ -25,9 +29,6 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
-    allowedHeaders:
-      'Origin, X-Requested-With, Content, Accept, Process-Data, Authorization',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     origin: (
       requestOrigin: string,
       callback: (err: Error | null, origin?: any) => void
@@ -36,22 +37,10 @@ async function bootstrap() {
     },
   });
 
-  app.use(morgan('dev'));
-  app.use(
-    session({
-      secret: '12398damdm12adwmdaw129',
-      resave: false,
-      saveUninitialized: false,
-      cookie: { secure: false, httpOnly: true },
-      store: new PrismaSessionStore(new PrismaClient(), {
-        checkPeriod: 2 * 60 * 1000,
-        dbRecordIdIsSessionId: true,
-        dbRecordIdFunction: undefined,
-      }),
-    })
-  );
-  app.use(passport.initialize());
-  app.use(passport.session());
+  // app.use(morgan('dev'));
+  // app.use(expressSession);
+  // app.use(passport.initialize());
+  // app.use(passport.session());
 
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);

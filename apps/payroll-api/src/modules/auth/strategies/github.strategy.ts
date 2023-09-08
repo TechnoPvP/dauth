@@ -20,6 +20,8 @@ export class GithubStrategy extends PassportStrategy(Strategy) {
     done: (err: string | null, profile: any) => void
   ): Promise<any> {
     // console.log({ accessToken, refreshToken, profile });
+
+    console.log(profile);
     await this.authService.githubCallback({ profile, accessToken });
     return done(null, profile);
   }
