@@ -8,7 +8,11 @@ export class GithubAuthGuard extends AuthGuard('github') {
     const request = context.switchToHttp().getRequest<Request>();
     const result = (await super.canActivate(context)) as boolean;
 
-    // request.session.redirectUrl = 'https://payroll.airhublabs.dev';
+    if (result && !request?.session?.passport) {
+      request.session.redirectUrl =
+        (request.query.redirectUrl as string) || 'http//localhost:4200';
+      await super.logIn(request);
+    }
 
     return result;
   }

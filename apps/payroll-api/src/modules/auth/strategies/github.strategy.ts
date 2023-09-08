@@ -10,6 +10,7 @@ export class GithubStrategy extends PassportStrategy(Strategy) {
       clientID: process.env['GITHUB_CLIENT_ID'],
       clientSecret: process.env['GITHUB_CLIENT_SECRET'],
       callbackURL: 'http://localhost:5050/auth/github/callback',
+      session: true,
     } as StrategyOptions);
   }
 
@@ -20,8 +21,6 @@ export class GithubStrategy extends PassportStrategy(Strategy) {
     done: (err: string | null, profile: any) => void
   ): Promise<any> {
     // console.log({ accessToken, refreshToken, profile });
-
-    console.log(profile);
     await this.authService.githubCallback({ profile, accessToken });
     return done(null, profile);
   }

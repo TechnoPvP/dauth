@@ -7,19 +7,22 @@ import morgan from 'morgan';
 import passport from 'passport';
 import { AppModule } from './app/app.module';
 
+const client = new PrismaClient();
+
 const expressSession = session({
   secret: 'daw31231231231dd',
-  resave: true,
-  saveUninitialized: true,
+  resave: false,
+  saveUninitialized: false,
   cookie: {
     secure: false,
-    domain: 'localhost',
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60,
+
+    maxAge: 24 * 60 * 60 * 1000,
   },
-  store: new PrismaSessionStore(new PrismaClient(), {
+  store: new PrismaSessionStore(client, {
     checkPeriod: 2 * 60 * 1000,
     dbRecordIdIsSessionId: true,
+    dbRecordIdFunction: undefined,
+    logger: console,
   }),
 });
 
@@ -37,10 +40,10 @@ async function bootstrap() {
     },
   });
 
-  // app.use(morgan('dev'));
-  // app.use(expressSession);
-  // app.use(passport.initialize());
-  // app.use(passport.session());
+  app.use(morgan('dev'));
+  app.use(expressSession);
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);
