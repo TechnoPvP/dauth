@@ -15,8 +15,8 @@ const expressSession = session({
   saveUninitialized: false,
   cookie: {
     secure: false,
-
-    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24,
   },
   store: new PrismaSessionStore(client, {
     checkPeriod: 2 * 60 * 1000,
@@ -54,6 +54,12 @@ declare module 'express-session' {
     user?: any;
     passport?: any;
     redirectUrl?: string;
+  }
+}
+
+declare module 'express' {
+  interface Request {
+    user?: any & { redirectUrl: string };
   }
 }
 

@@ -91,7 +91,7 @@ export function Index() {
             <a href="http://localhost:5050/auth/login/google">
               Continue with Google
             </a>
-            <a href="http://localhost:5050/auth/login/github">
+            <a href="http://localhost:5050/auth/login/github?redirectUrl=https://webrevived.com">
               Continue with Github
             </a>
 

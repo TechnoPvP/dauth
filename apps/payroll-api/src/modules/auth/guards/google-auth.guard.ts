@@ -6,13 +6,21 @@ import { Request } from 'express';
 export class GoogleAuthGuard extends AuthGuard('google') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const result = (await super.canActivate(context)) as boolean;
+    const redirectUrl = request.query?.redirectUrl as string;
+    if (redirectUrl) request.session.redirectUrl = redirectUrl;
 
-    if (result && !request?.session?.passport) {
-      request.session.redirectUrl =
-        (request.query.redirectUrl as string) || 'http//localhost:4200';
-      await super.logIn(request);
-    }
+    const result = (await super.canActivate(context)) as boolean;
+    const user = request?.user;
+
+    if (!user) return false;
+
+    await new Promise<void>((resolve, reject) =>
+      request.logIn(
+        { ...user },
+        { session: true, keepSessionInfo: true },
+        (err: any) => (err ? reject(err) : resolve())
+      )
+    );
 
     return result;
   }

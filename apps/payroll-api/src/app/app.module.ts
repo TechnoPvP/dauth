@@ -41,34 +41,6 @@ const client = new PrismaClient();
         whitelist: true,
       }),
     },
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: UnauthorizedExceptionFilter,
-    // },
   ],
 })
-export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(
-  //       session({
-  //         secret: 'daw31231231231dd',
-  //         resave: true,
-  //         saveUninitialized: true,
-  //         cookie: {
-  //           secure: false,
-  //           domain: 'localhost',
-  //           httpOnly: true,
-  //           maxAge: 1000 * 60 * 60,
-  //         },
-  //         store: new PrismaSessionStore(client, {
-  //           checkPeriod: 2 * 60 * 1000,
-  //           dbRecordIdIsSessionId: true,
-  //         }),
-  //       }),
-  //       passport.initialize(),
-  //       passport.session()
-  //     )
-  //     .forRoutes('*');
-  // }
-}
+export class AppModule {}

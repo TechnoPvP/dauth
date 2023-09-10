@@ -19,7 +19,6 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly user: UsersService,
-    private readonly github: GithubApi
   ) {}
 
   async localLogin(loginDto: LoginDto) {
