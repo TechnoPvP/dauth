@@ -1,15 +1,50 @@
 import { Button, ButtonGroup } from '@chakra-ui/button';
 import { FormControl, FormLabel } from '@chakra-ui/form-control';
-import { Icon } from '@chakra-ui/icon';
+import { Icon } from '@iconify/react';
+import githubIcon from '@iconify/icons-logos/github-icon';
+import googleIcon from '@iconify/icons-logos/google-icon';
+import microsoftIcon from '@iconify/icons-logos/microsoft-icon';
 import { Input, InputGroup, InputLeftElement } from '@chakra-ui/input';
-import { VStack } from '@chakra-ui/layout';
+import { AbsoluteCenter, Box, HStack, VStack } from '@chakra-ui/layout';
 import { EmailIcon, LockIcon } from '@chakra-ui/icons';
-import { Divider } from '@chakra-ui/react';
-import { Text } from '@chakra-ui/react';
+import { Divider, useTheme } from '@chakra-ui/react';
+import { Text, Heading, FormErrorMessage } from '@chakra-ui/react';
 import axios, { AxiosError } from 'axios';
 import Link from 'next/link';
+import {
+  Controller,
+  SubmitErrorHandler,
+  SubmitHandler,
+  useForm,
+} from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+
+export const loginSchema = z.object({
+  email: z.string().email({ message: 'Email is required' }),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export const loginSchemaWithoutPassword = loginSchema.omit({ password: true });
+
+export type LoginSchema = z.infer<typeof loginSchema>;
 
 export function Index() {
+  const [isLocalStrategy, setIsLocalStrategy] = useState<boolean>(false);
+
+  const { control, watch, handleSubmit, formState, trigger } =
+    useForm<LoginSchema>({
+      mode: 'onTouched',
+      reValidateMode: 'onChange',
+      defaultValues: {
+        email: '',
+      },
+      resolver: isLocalStrategy
+        ? zodResolver(loginSchema)
+        : zodResolver(loginSchemaWithoutPassword),
+    });
+
   const handleMe = async () => {
     try {
       const response = await axios.get('http://localhost:5050/auth/me', {
@@ -23,55 +58,99 @@ export function Index() {
     }
   };
 
+  const handleValidSubmit: SubmitHandler<LoginSchema> = (data, event) => {
+    if (!isLocalStrategy) return setIsLocalStrategy(true);
+  };
+
+  const handleInvalidSubmit: SubmitErrorHandler<LoginSchema> = (
+    error,
+    event
+  ) => {
+    console.log('Submission error', error);
+  };
+
   return (
     <>
-      {/* <a href="http://localhost:5010/auth/login/github">Login With Github</a> */}
-
       <main>
         <div className="login-container">
           <VStack spacing={5}>
-            <Text fontSize="xl"> Airhublabs </Text>
-
-            <FormControl>
-              <FormLabel>Email</FormLabel>
-
-              <InputGroup>
-                <InputLeftElement>
-                  <Icon as={LockIcon} />
-                </InputLeftElement>
-                <Input type="email" placeholder="Email" />
-              </InputGroup>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>Password</FormLabel>
-
-              <InputGroup>
-                <InputLeftElement>
-                  <Icon as={EmailIcon} />
-                </InputLeftElement>
-                <Input type="password" placeholder="Password" />
-              </InputGroup>
-            </FormControl>
-
-            <Button variant="solid" w="full" colorScheme="twitter">
-              Login
-            </Button>
-
-            <Button onClick={handleMe}>Me</Button>
-
-            <Divider />
-
-            {/* <Button
-              variant="outline"
-              w="full"
-              borderColor="gray.200"
-              color="gray.600"
+            <form
+              className="form-container"
+              onSubmit={handleSubmit(handleValidSubmit, handleInvalidSubmit)}
             >
-               Continue with Microsoft
-            </Button> */}
+              <VStack spacing={5}>
+                <VStack>
+                  <Heading fontSize="3xl">Log In to to your account</Heading>
+                  <Text fontSize="md" color="gray.500">
+                    Central platform that connects everything
+                  </Text>
+                </VStack>
 
-            {/* <Link
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field, fieldState, formState }) => (
+                    <FormControl isInvalid={fieldState.invalid}>
+                      <FormLabel>Email</FormLabel>
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        {...field}
+                      />
+                      <FormErrorMessage>
+                        {fieldState.error?.message}
+                      </FormErrorMessage>
+                    </FormControl>
+                  )}
+                />
+
+                {isLocalStrategy && (
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field, fieldState, formState }) => (
+                      <FormControl isInvalid={fieldState.invalid}>
+                        <FormLabel>Password</FormLabel>
+                        <Input
+                          type="password"
+                          placeholder="Password"
+                          {...field}
+                        />
+                        <FormErrorMessage>
+                          {fieldState.error?.message}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  />
+                )}
+
+                <Button
+                  variant="solid"
+                  w="full"
+                  colorScheme="twitter"
+                  type={'submit'}
+                >
+                  Continue with email
+                </Button>
+              </VStack>
+            </form>
+
+            {/* <Button onClick={handleMe}>Me</Button> */}
+
+            <Box position="relative" paddingY="4" w="full">
+              <Divider />
+              <AbsoluteCenter
+                position="relative"
+                zIndex="docked"
+                bg="rgb(252, 252, 252)"
+                px="3"
+                color="gray.500"
+              >
+                OR
+              </AbsoluteCenter>
+            </Box>
+
+            <Link
               href="http://localhost:5050/auth/login/google"
               style={{ width: '100%' }}
             >
@@ -80,23 +159,14 @@ export function Index() {
                 w="full"
                 borderColor="gray.200"
                 color="gray.600"
+                leftIcon={<Icon icon={microsoftIcon} />}
               >
-                Continue with Google
+                Continue with Microsoft
               </Button>
-            </Link> */}
+            </Link>
 
-            <a href="http://localhost:5050/auth/login/azure">
-              Continue with Microsoft
-            </a>
-            <a href="http://localhost:5050/auth/login/google">
-              Continue with Google
-            </a>
-            <a href="http://localhost:5050/auth/login/github">
-              Continue with Github
-            </a>
-
-            {/* <Link
-              href="http://localhost:5050/auth/login/github"
+            <Link
+              href="http://localhost:5050/auth/login/google"
               style={{ width: '100%' }}
             >
               <Button
@@ -104,10 +174,37 @@ export function Index() {
                 w="full"
                 borderColor="gray.200"
                 color="gray.600"
+                leftIcon={<Icon icon={googleIcon} />}
+              >
+                Continue with Google
+              </Button>
+            </Link>
+
+            <Link
+              href="http://localhost:5050/auth/login/github"
+              style={{ width: '100%' }}
+            >
+              <Button
+                leftIcon={<Icon icon={githubIcon} />}
+                variant="outline"
+                w="full"
+                borderColor="gray.200"
+                color="gray.600"
               >
                 Continue with Github
               </Button>
-            </Link> */}
+            </Link>
+
+            <HStack spacing="1">
+              <Text>Having issues?</Text>
+              <Text
+                cursor={'pointer'}
+                color={'#3b76b6'}
+                textDecorationColor={'#3b76b6'}
+              >
+                Contact Us
+              </Text>
+            </HStack>
           </VStack>
         </div>
       </main>
@@ -120,6 +217,26 @@ export function Index() {
           width: 100%;
           height: 100%;
           background-color: #fcfcfc;
+        }
+
+        .form-container {
+          width: 100%;
+        }
+
+        .link {
+          position: relative;
+          display: inline-block;
+        }
+
+        .underline {
+          position: absolute;
+          width: 0%;
+          height: 1.5px;
+          background-color: #3b76b6;
+          transition: width 0.15s ease-in;
+          left: 0;
+          right: unset;
+          bottom: 0;
         }
 
         .login-container {
