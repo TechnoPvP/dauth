@@ -87,18 +87,18 @@ export const Index: NextPage<
     console.log('Submission error', error);
   };
 
-  const logout = async () => {
-    try {
-      const response = await axios.post('http://localhost:5050/auth/logout', {}, {
-        withCredentials: true,
-      });
-      console.log(response.data);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.log(error.response?.data);
-      }
-    }
-  };
+  // const logout = async () => {
+  //   try {
+  //     const response = await axios.post('http://localhost:5050/auth/logout', {}, {
+  //       withCredentials: true,
+  //     });
+  //     console.log(response.data);
+  //   } catch (error) {
+  //     if (error instanceof AxiosError) {
+  //       console.log(error.response?.data);
+  //     }
+  //   }
+  // };
 
   return (
     <>
@@ -239,9 +239,9 @@ export const Index: NextPage<
           </VStack>
         </div>
 
-        <Button onClick={handleCallHrms}>Call HRMS</Button>
+        {/* <Button onClick={handleCallHrms}>Call HRMS</Button>
         <Button onClick={handleMe}>Call Auth</Button>
-        <Button onClick={logout}>Logout</Button>
+        <Button onClick={logout}>Logout</Button> */}
       </main>
 
       <style jsx>{`
