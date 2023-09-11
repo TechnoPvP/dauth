@@ -1,6 +1,9 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './styles.css';
+
+const queryClient = new QueryClient();
 
 function CustomApp({ Component, pageProps }: AppProps) {
   return (
@@ -9,7 +12,9 @@ function CustomApp({ Component, pageProps }: AppProps) {
         <title>Welcome to payroll-web!</title>
       </Head>
       <main className="app">
-        <Component {...pageProps} />
+        <QueryClientProvider client={queryClient}>
+          <Component {...pageProps} />
+        </QueryClientProvider>
       </main>
     </>
   );
