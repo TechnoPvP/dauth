@@ -66,7 +66,8 @@ export const createExpressSession = (params: {
     saveUninitialized: false,
     cookie: {
       secure: false,
-      sameSite: 'lax',
+      domain: 'localhost',
+      sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 24,
     },
     store: prismaSessionStore,
