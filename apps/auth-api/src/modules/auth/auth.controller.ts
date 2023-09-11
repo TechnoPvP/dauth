@@ -6,7 +6,7 @@ import {
   Query,
   Request,
   Response,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import {
   Request as ExpressRequest,
@@ -16,11 +16,14 @@ import { AzureAdAuthGuard } from './guards/azure-ad-auth.guard';
 import { GithubAuthGuard } from './guards/github-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
   private readonly DEFAULT_REDIRECT_URL = 'http://localhost:4200';
   private readonly logger = new Logger(AuthController.name);
+
+  constructor(private readonly authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -68,7 +71,7 @@ export class AuthController {
   @UseGuards(AzureAdAuthGuard)
   @Get('login/azure')
   async loginAzure(@Request() req: ExpressRequest) {
-    return req?.user
+    return req?.user;
   }
 
   @UseGuards(AzureAdAuthGuard)
@@ -84,7 +87,46 @@ export class AuthController {
 
   @Get('me')
   async me(@Request() req: ExpressRequest) {
-    console.log(req.session, req.user);
     return req.user;
+  }
+
+  @Post('logout')
+  async logout(
+    @Request() req: ExpressRequest,
+    @Response() res: ExpressResponse
+  ) {
+    if (!req.session || !req.user) {
+      res
+        .status(401)
+        .json({ message: 'You must be logged in to preform this action' });
+      return;
+    }
+    try {
+      await this.authService.destroySession(req);
+
+      res
+        .status(200)
+        .clearCookie('connect.sid')
+        .json({ message: 'Logged out successfully' });
+    } catch (error) {
+      this.logger.error('Failed to logout user', error);
+
+      if (req.session) {
+        try {
+          await this.authService.logout(req);
+          this.logger.error(
+            'Forcefully destroyed session after failed logout attempt',
+            error
+          );
+        } catch (error) {
+          this.logger.error('Failed to forcefully destroy session', error);
+        } finally {
+          res
+            .status(501)
+            .clearCookie('connect.sid')
+            .json({ message: 'Graceful logout failed, destroying session' });
+        }
+      }
+    }
   }
 }

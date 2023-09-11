@@ -1,16 +1,21 @@
-import { Button, ButtonGroup } from '@chakra-ui/button';
+import { Button } from '@chakra-ui/button';
 import { FormControl, FormLabel } from '@chakra-ui/form-control';
-import { Icon } from '@iconify/react';
+import { Input } from '@chakra-ui/input';
+import { AbsoluteCenter, Box, HStack, VStack } from '@chakra-ui/layout';
+import { Divider, FormErrorMessage, Heading, Text } from '@chakra-ui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import githubIcon from '@iconify/icons-logos/github-icon';
 import googleIcon from '@iconify/icons-logos/google-icon';
 import microsoftIcon from '@iconify/icons-logos/microsoft-icon';
-import { Input, InputGroup, InputLeftElement } from '@chakra-ui/input';
-import { AbsoluteCenter, Box, HStack, VStack } from '@chakra-ui/layout';
-import { EmailIcon, LockIcon } from '@chakra-ui/icons';
-import { Divider, useTheme } from '@chakra-ui/react';
-import { Text, Heading, FormErrorMessage } from '@chakra-ui/react';
+import { Icon } from '@iconify/react';
 import axios, { AxiosError } from 'axios';
+import {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  NextPage,
+} from 'next';
 import Link from 'next/link';
+import { useState } from 'react';
 import {
   Controller,
   SubmitErrorHandler,
@@ -18,8 +23,6 @@ import {
   useForm,
 } from 'react-hook-form';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
 
 export const loginSchema = z.object({
   email: z.string().email({ message: 'Email is required' }),
@@ -30,7 +33,9 @@ export const loginSchemaWithoutPassword = loginSchema.omit({ password: true });
 
 export type LoginSchema = z.infer<typeof loginSchema>;
 
-export function Index() {
+export const Index: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ redirectUrl }) => {
   const [isLocalStrategy, setIsLocalStrategy] = useState<boolean>(false);
 
   const { control, watch, handleSubmit, formState, trigger } =
@@ -58,6 +63,19 @@ export function Index() {
     }
   };
 
+  const handleCallHrms = async () => {
+    try {
+      const response = await axios.get('http://localhost:6010/employee', {
+        withCredentials: true,
+      });
+      console.log(response.data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(error.response?.data);
+      }
+    }
+  };
+
   const handleValidSubmit: SubmitHandler<LoginSchema> = (data, event) => {
     if (!isLocalStrategy) return setIsLocalStrategy(true);
   };
@@ -67,6 +85,19 @@ export function Index() {
     event
   ) => {
     console.log('Submission error', error);
+  };
+
+  const logout = async () => {
+    try {
+      const response = await axios.post('http://localhost:5050/auth/logout', {}, {
+        withCredentials: true,
+      });
+      console.log(response.data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(error.response?.data);
+      }
+    }
   };
 
   return (
@@ -151,7 +182,7 @@ export function Index() {
             </Box>
 
             <Link
-              href="http://localhost:5050/auth/login/google"
+              href={`http://localhost:5050/auth/login/microsoft?redirectUrl=${redirectUrl}`}
               style={{ width: '100%' }}
             >
               <Button
@@ -166,7 +197,7 @@ export function Index() {
             </Link>
 
             <Link
-              href="http://localhost:5050/auth/login/google"
+              href={`http://localhost:5050/auth/login/google?redirectUrl=${redirectUrl}`}
               style={{ width: '100%' }}
             >
               <Button
@@ -181,7 +212,7 @@ export function Index() {
             </Link>
 
             <Link
-              href="http://localhost:5050/auth/login/github"
+              href={`http://localhost:5050/auth/login/github`}
               style={{ width: '100%' }}
             >
               <Button
@@ -207,6 +238,10 @@ export function Index() {
             </HStack>
           </VStack>
         </div>
+
+        <Button onClick={handleCallHrms}>Call HRMS</Button>
+        <Button onClick={handleMe}>Call Auth</Button>
+        <Button onClick={logout}>Logout</Button>
       </main>
 
       <style jsx>{`
@@ -247,6 +282,22 @@ export function Index() {
       `}</style>
     </>
   );
-}
+};
+
+export const getServerSideProps: GetServerSideProps<{
+  redirectUrl: string | null;
+}> = async (context) => {
+  const redirectUrl: string | undefined = Array.isArray(
+    context.query.redirectUrl
+  )
+    ? context.query.redirectUrl[0]
+    : context.query.redirectUrl;
+
+  return {
+    props: {
+      redirectUrl: redirectUrl || null,
+    },
+  };
+};
 
 export default Index;

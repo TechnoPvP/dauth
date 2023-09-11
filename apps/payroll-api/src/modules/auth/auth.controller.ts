@@ -6,7 +6,7 @@ import {
   Query,
   Request,
   Response,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import {
   Request as ExpressRequest,
@@ -68,7 +68,7 @@ export class AuthController {
   @UseGuards(AzureAdAuthGuard)
   @Get('login/azure')
   async loginAzure(@Request() req: ExpressRequest) {
-    return req?.user
+    return req?.user;
   }
 
   @UseGuards(AzureAdAuthGuard)
@@ -84,7 +84,7 @@ export class AuthController {
 
   @Get('me')
   async me(@Request() req: ExpressRequest) {
-    console.log(req.session, req.user);
     return req.user;
   }
+
 }

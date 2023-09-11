@@ -10,6 +10,7 @@ import { BaseAuthEntity } from './entities/auth.entity';
 import { GithubStrategy } from './strategies/github.strategy';
 import { GithubProfileEntity } from '../../common/auth/github/github-profile.entity';
 import { GoogleProfileEntity } from './entities/google-profile.entity';
+import { Request, Response } from 'express';
 import { MicrosoftProfileEntity } from './entities/microsoft-profile.entity';
 
 @Injectable()
@@ -18,7 +19,7 @@ export class AuthService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly user: UsersService,
+    private readonly user: UsersService
   ) {}
 
   async localLogin(loginDto: LoginDto) {
@@ -162,6 +163,30 @@ export class AuthService {
     });
 
     return user;
+  }
+
+  async logout(req: Request): Promise<void> {
+    return new Promise((resolve, reject) => {
+      req.logOut({ keepSessionInfo: false }, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  async destroySession(req: Request): Promise<void> {
+    return new Promise((resolve, reject) => {
+      req.session?.destroy((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 
   getFormattedMicrosoftDisplayName(displayName: string) {

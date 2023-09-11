@@ -7,7 +7,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Welcome to auth-web!</title>
+        <title>AirhubOne Login</title>
       </Head>
 
       <RootLayout>
