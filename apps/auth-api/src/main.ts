@@ -6,24 +6,13 @@ import session from 'express-session';
 import morgan from 'morgan';
 import passport from 'passport';
 import { AppModule } from './app/app.module';
+import { createExpressSession } from 'libs/auth/src/lib/middleware/auth.middleware';
 
 const client = new PrismaClient();
 
-const expressSession = session({
-  secret: 'daw31231231231dd',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false,
-    sameSite: 'lax',
-    maxAge: 1000 * 60 * 60 * 24,
-  },
-  store: new PrismaSessionStore(client, {
-    checkPeriod: 2 * 60 * 1000,
-    dbRecordIdIsSessionId: true,
-    dbRecordIdFunction: undefined,
-    logger: console,
-  }),
+const expressSession = createExpressSession({
+  client,
+  secret: "daw31231231231dd",
 });
 
 async function bootstrap() {

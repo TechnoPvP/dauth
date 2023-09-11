@@ -87,6 +87,7 @@ export class AuthController {
 
   @Get('me')
   async me(@Request() req: ExpressRequest) {
+    console.log(req.user, req.session);
     return req.user;
   }
 
