@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   Logger,
@@ -7,32 +6,21 @@ import {
   Query,
   Request,
   Response,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { GithubApi } from '../../common/auth/github/github.api';
-import { AuthService } from './auth.service';
-import { GithubCallbackDto } from './dto/github-callback.dto';
-import { AuthenticatedGuard } from './guards/authenticated.guard';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import {
-  Response as ExpressResponse,
   Request as ExpressRequest,
+  Response as ExpressResponse,
 } from 'express';
-import { GithubAuthGuard } from './guards/github-auth.guard';
-import { GoogleStrategy } from './strategies/google.strategy';
-import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { AzureAdAuthGuard } from './guards/azure-ad-auth.guard';
+import { GithubAuthGuard } from './guards/github-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  private readonly DEFAULT_REDIRECT_URL = 'https://localhost:4200';
+  private readonly DEFAULT_REDIRECT_URL = 'http://localhost:4200';
   private readonly logger = new Logger(AuthController.name);
-
-  constructor(
-    private readonly authService: AuthService,
-    private readonly github: GithubApi
-  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -53,9 +41,9 @@ export class AuthController {
     @Response() res: ExpressResponse,
     @Query() githubCallbackDto: any
   ) {
-    const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
+    const redirectUrl = req.session?.redirectUrl || this.DEFAULT_REDIRECT_URL;
+    delete req.session.redirectUrl;
 
-    // return req.user
     return res.redirect(redirectUrl);
   }
 
@@ -71,7 +59,8 @@ export class AuthController {
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse
   ) {
-    const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
+    const redirectUrl = req.session?.redirectUrl || this.DEFAULT_REDIRECT_URL;
+    delete req.session.redirectUrl;
 
     return res.redirect(redirectUrl);
   }
@@ -79,7 +68,7 @@ export class AuthController {
   @UseGuards(AzureAdAuthGuard)
   @Get('login/azure')
   async loginAzure(@Request() req: ExpressRequest) {
-    return req?.user || { message: 'ok' };
+    return req?.user
   }
 
   @UseGuards(AzureAdAuthGuard)
@@ -88,10 +77,9 @@ export class AuthController {
     @Request() req: ExpressRequest,
     @Response() res: ExpressResponse
   ) {
-    this.logger.debug('HIT AZURE CALLBACK FUNCTION');
-    // const redirectUrl = req.session?.redirectUrl || 'http://localhost:4200';
+    const redirectUrl = req.session?.redirectUrl || this.DEFAULT_REDIRECT_URL;
 
-    return res.redirect('http://localhost:4200');
+    return res.redirect(redirectUrl);
   }
 
   @Get('me')
