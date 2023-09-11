@@ -15,6 +15,10 @@ export class AppController {
   @UseGuards(AuthenticatedGuard)
   @Get('employee')
   listEmployee(@Request() request: ExpressRequest) {
-    return { session: request.session, user: request.user || null };
+    return {
+      session: request.session,
+      user: request.user || null,
+      status: 'unknown',
+    };
   }
 }
