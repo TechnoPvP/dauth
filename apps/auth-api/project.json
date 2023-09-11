@@ -27,14 +27,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "apps/auth-api:build"
+        "buildTarget": "auth-api:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "apps/auth-api:build:development"
+          "buildTarget": "auth-api:build:development"
         },
         "production": {
-          "buildTarget": "apps/auth-api:build:production"
+          "buildTarget": "auth-api:build:production"
         }
       }
     },
