@@ -1,14 +1,13 @@
+import { createExpressSession } from '@dauth/auth';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { PrismaClient } from '@prisma/client';
-import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import session from 'express-session';
+import { readFileSync } from 'fs';
 import morgan from 'morgan';
 import passport from 'passport';
-import { AppModule } from './app/app.module';
-import { createExpressSession } from 'libs/auth/src/lib/middleware/auth.middleware';
-import { readFileSync } from 'fs';
 import path from 'path';
+import { AppModule } from './app/app.module';
 
 const client = new PrismaClient();
 
