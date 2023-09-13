@@ -52,7 +52,7 @@ export const Index: NextPage<
 
   const handleMe = async () => {
     try {
-      const response = await axios.get('http://localhost:5050/auth/me', {
+      const response = await axios.get('https://localhost:5050/auth/me', {
         withCredentials: true,
       });
       console.log(response.data);
@@ -220,7 +220,7 @@ export const Index: NextPage<
             </Link>
 
             <Link
-              href={`http://localhost:5050/auth/login/github`}
+              href={`https://localhost:5050/auth/login/github`}
               style={{ width: '100%' }}
             >
               <Button
