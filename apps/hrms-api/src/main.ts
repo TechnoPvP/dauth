@@ -1,9 +1,18 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
+import { readFileSync } from 'fs';
+import path from 'path';
+
+const httpsOptions = {
+  key: readFileSync(path.join('/Users/adam/code/Cert/', 'localhost-key.pem')),
+  cert: readFileSync(path.join('/Users/adam/code/Cert/', 'localhost.pem')),
+};
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions,
+  });
   const port = 6010;
 
   app.enableCors({

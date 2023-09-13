@@ -44,10 +44,12 @@ export class AuthController {
     @Response() res: ExpressResponse,
     @Query() githubCallbackDto: any
   ) {
-    const redirectUrl = req.session?.redirectUrl || this.DEFAULT_REDIRECT_URL;
+    const redirectUrl = req.session?.redirectUrl || req.user.redirectUrl;
     delete req.session.redirectUrl;
 
-    return res.redirect(redirectUrl);
+    console.log(redirectUrl);
+
+    return res.redirect(redirectUrl || 'https://localhost:4200/test');
   }
 
   @UseGuards(GoogleAuthGuard)
