@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { compareSync } from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/auth.dto';
@@ -12,6 +18,7 @@ import { GithubProfileEntity } from '../../common/auth/github/github-profile.ent
 import { GoogleProfileEntity } from './entities/google-profile.entity';
 import { Request, Response } from 'express';
 import { MicrosoftProfileEntity } from './entities/microsoft-profile.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -19,27 +26,38 @@ export class AuthService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly user: UsersService
+    private readonly user: UsersService,
+    private readonly jwtService: JwtService
   ) {}
+
+  async generateJwt(payload: any) {
+    return this.jwtService.signAsync(payload);
+  }
 
   async localLogin(loginDto: LoginDto) {
     const user = await this.user.retrieveByEmail(loginDto.email);
 
-    if (user.auth_provider !== 'LOCAL' || !user.password)
+    if (!user) throw new UnauthorizedException('Invalid email or password');
+
+    if (user.auth_provider !== 'LOCAL' || !user.local_auth)
       throw new HttpException(
         'Local auth provider is not active',
         HttpStatus.BAD_REQUEST
       );
 
-    const isValidPassword = compareSync(loginDto.password, user?.password);
+    const isValidPassword = compareSync(
+      loginDto.password,
+      user.local_auth.password
+    );
 
-    if (user && isValidPassword) {
-      const { password, ...userData } = user;
+    if (!isValidPassword)
+      throw new UnauthorizedException('Invalid email or password');
 
-      return userData;
-    }
+    const { local_auth, ...userData } = user;
 
-    return null;
+    const jwt = await this.generateJwt(userData);
+
+    return { ...userData, jwt };
   }
 
   async githubCallback(params: {
