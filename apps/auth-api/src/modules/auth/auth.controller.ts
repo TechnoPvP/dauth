@@ -17,6 +17,7 @@ import { GithubAuthGuard } from './guards/github-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -90,6 +91,12 @@ export class AuthController {
   @Get('me')
   async me(@Request() req: ExpressRequest) {
     console.log(req.user, req.session);
+    return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/jwt')
+  async meJwt(@Request() req: ExpressRequest) {
     return req.user;
   }
 
