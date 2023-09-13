@@ -16,10 +16,10 @@ model User {
   last_name      String
   email          String
   avatar         String?
-  password       String?
   auth_provider  AuthProvider
   github_auth    GithubAuth?
   google_auth    GoogleAuth?
+  local_auth     LocalAuth?
   microsoft_auth MicrosoftAuth?
 }
 
@@ -35,6 +35,15 @@ model GithubAuth {
   user_id     Int      @unique
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+}
+
+model LocalAuth {
+  id         Int      @id @default(autoincrement())
+  password   String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    Int      @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model GoogleAuth {
