@@ -1,3 +1,4 @@
+import { PrismaService } from '@dauth/database-service';
 import {
   HttpException,
   HttpStatus,
@@ -5,20 +6,15 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
+import { AuthProvider, Prisma } from '@prisma/client';
 import { compareSync } from 'bcrypt';
+import { Request } from 'express';
+import { GithubProfileEntity } from '../../common/auth/github/github-profile.entity';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/auth.dto';
-import { GithubCallbackDto } from './dto/github-callback.dto';
-import { GithubApi } from '../../common/auth/github/github.api';
-import { PrismaService } from '@dauth/database-service';
-import { AuthProvider, Prisma } from '@prisma/client';
 import { BaseAuthEntity } from './entities/auth.entity';
-import { GithubStrategy } from './strategies/github.strategy';
-import { GithubProfileEntity } from '../../common/auth/github/github-profile.entity';
 import { GoogleProfileEntity } from './entities/google-profile.entity';
-import { Request, Response } from 'express';
 import { MicrosoftProfileEntity } from './entities/microsoft-profile.entity';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -26,13 +22,8 @@ export class AuthService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly user: UsersService,
-    private readonly jwtService: JwtService
+    private readonly user: UsersService
   ) {}
-
-  async generateJwt(payload: any) {
-    return this.jwtService.signAsync(payload);
-  }
 
   async localLogin(loginDto: LoginDto) {
     const user = await this.user.retrieveByEmail(loginDto.email);
@@ -55,9 +46,7 @@ export class AuthService {
 
     const { local_auth, ...userData } = user;
 
-    const jwt = await this.generateJwt(userData);
-
-    return { ...userData, jwt };
+    return { ...userData };
   }
 
   async githubCallback(params: {
