@@ -12,12 +12,12 @@ import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
+import { AuthService } from './auth.service';
 import { AzureAdAuthGuard } from './guards/azure-ad-auth.guard';
 import { GithubAuthGuard } from './guards/github-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
